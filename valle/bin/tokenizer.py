@@ -117,8 +117,10 @@ def main():
         prefix=args.prefix,
         suffix=args.suffix,
     )
-
-    text_tokenizer = TextTokenizer()
+    if args.prefix=="aishell":
+        text_tokenizer = TextTokenizer(backend="pypinyin")
+    else:
+        text_tokenizer = TextTokenizer()
 
     # Fix RuntimeError: Cowardly refusing to serialize non-leaf tensor...
     # by remove encodec weight_norm
@@ -160,7 +162,6 @@ def main():
 
             if args.prefix == "ljspeech":
                 cut_set = cut_set.resample(24000)
-
             with torch.no_grad():
                 cut_set = cut_set.compute_and_store_features(
                     extractor=extractor,
@@ -176,6 +177,12 @@ def main():
                     text = c.supervisions[0].custom["normalized_text"]
                     text = text.replace("”", '"').replace("“", '"')
                     phonemes = tokenize_text(text_tokenizer, text=text)
+                elif args.prefix == "aishell":
+                    phonemes = tokenize_text(
+                        text_tokenizer, text=c.supervisions[0].text
+                    )
+                    c.supervisions[0].custom={}
+                    phonemes=phonemes.split("_")
                 else:
                     assert args.prefix == "libritts"
                     phonemes = tokenize_text(
