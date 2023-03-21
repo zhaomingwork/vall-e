@@ -44,6 +44,7 @@ class PypinyinBackend:
         self.g2p_type=g2p_type
     def phonemize(self,text,separator="", strip="", njobs=1):
         # separator strip njobs are not used 
+        text=text[0].replace(" ","") # remove space
         if self.g2p_type=="pypinyin_g2p":
               from pypinyin import Style, pinyin
               phones = [phone[0] for phone in pinyin(text, style=Style.TONE3)]
@@ -93,8 +94,11 @@ class TextTokenizer:
                 language_switch=language_switch,
                 words_mismatch=words_mismatch,
             )
-        elif backend == "pypinyin":
-            phonemizer=PypinyinBackend(g2p_type="pypinyin_g2p")
+        elif backend.startswith("pypinyin"):
+            if backend=="pypinyin_g2p":
+                phonemizer=PypinyinBackend(g2p_type="pypinyin_g2p")
+            else:
+                phonemizer=PypinyinBackend(g2p_type="pypinyin_g2p_phone")
         else:
             raise NotImplementedError(f"{backend}")
 

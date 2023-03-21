@@ -118,7 +118,7 @@ def main():
         suffix=args.suffix,
     )
     if args.prefix=="aishell":
-        text_tokenizer = TextTokenizer(backend="pypinyin")
+        text_tokenizer = TextTokenizer(backend="pypinyin_g2p")
     else:
         text_tokenizer = TextTokenizer()
 
